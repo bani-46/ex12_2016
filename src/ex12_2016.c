@@ -233,7 +233,7 @@ CELL *sort_list(CELL *_list_head,NODE *_tree_head){
 
 	tail = &dummy;
 	dummy.next=NULL;
-	puts("sort-start\n");
+	puts("sort start\n");
 	/*tree内にノードがなくなるまでループ*/
 	while(deleted_tree!=NULL){
 		_tree_head=deleted_tree;//tree先頭更新
@@ -246,6 +246,7 @@ CELL *sort_list(CELL *_list_head,NODE *_tree_head){
 		/*treeから最小ノード削除*/
 		deleted_tree=delete_min(_tree_head);
 	}
+	puts("sort end\n");
 	return dummy.next;
 }
 
