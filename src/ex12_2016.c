@@ -36,17 +36,19 @@ typedef struct node{
 CELL *input_func(char *INPUTFILE);
 CELL *make_cell(REC _val,CELL *cp);
 
+/*ソート関連（リスト）*/
 CELL *sort_func(CELL *_head,int (*_compare_func)(const void *comp1,const void *comp2));
 CELL *insert_cell(CELL *sort_head,CELL *insert_cell);
 
+/*ソート関連(ツリー)*/
 NODE *make_tree(CELL *list_head,int (*_compare_func)(const void *comp1,const void *comp2));
 NODE *insert_node(CELL *p,NODE *tree_head,int (*_compare_func)(const void *comp1,const void *comp2));
 void inorder(NODE *p);
 NODE *find_min(NODE *_tree_head);
-NODE *delete_node(NODE *node);
-NODE *delete_min(NODE *node,NODE *tree_head);
+NODE *delete_min(NODE *node);
 CELL *sort_list(CELL *_list_head,NODE *_tree_head);
 
+/*比較関数*/
 int compare_GPA(const void *comp1,const void *comp2);
 int compare_credit(const void *comp1,const void *comp2);
 int compare_name(const void *comp1,const void *comp2);
@@ -97,10 +99,6 @@ int main(int argc,char *argv[])
 
 	list_head=sort_list(list_head,tree_head->right);
 
-	puts("end");
-	//    /*ソート処理*/
-	//    sort_head = sort_func(head,compare_func);
-	//
 	/*出力ファイルに出力*/
 	output_func(argv[3],list_head);
 
@@ -205,6 +203,7 @@ void inorder(NODE *p){
 	inorder(p->right);
 }
 
+/*ひたすら左をたどって最小値発見*/
 NODE *find_min(NODE *_tree_head){
 	NODE *tree_p =_tree_head;
 	while(tree_p->left!=NULL){//一番左を探す
@@ -212,66 +211,43 @@ NODE *find_min(NODE *_tree_head){
 	}
 	return tree_p;
 }
-
-//NODE *delete_node(NODE *node){
-//	if(node==NULL)return NULL;
-//	if(node->right!=NULL){//→になにかあればそいつを返す
-//		NODE *temp=node->right;
-//		free(node);
-//		return temp;
-//	}
-//	free(node);//子を持たなければそのままデリート
-//	return NULL;
-//}
-
-NODE *delete_min(NODE *node,NODE *tree_head){
+/*一番左（最小）まで再帰で辿って自身を削除。また、右に要素があればそのノードを返す*/
+NODE *delete_min(NODE *node){
 	if (node->left == NULL) {
 		NODE *temp = node->right;
-		if(node==tree_head){
-			tree_head=tree_head->right;
-		}
 		free(node);
 		return temp;
 	}
-	node->left = delete_min(node->left,tree_head);
-	return tree_head;
+	node->left = delete_min(node->left);
+	return node;
 }
 
+/*二分木→リストへのソート*/
 CELL *sort_list(CELL *_list_head,NODE *_tree_head){
 	CELL dummy;
 	CELL *tail;
 	CELL *new_cell;
 	REC new_val;
 	NODE *min_node;
-	NODE *tree_p;
-	//	NODE  *temp;
-
 	NODE *deleted_tree=_tree_head;
+
 	tail = &dummy;
 	dummy.next=NULL;
 	puts("sort-start\n");
-
+	/*tree内にノードがなくなるまでループ*/
 	while(deleted_tree!=NULL){
-		tree_p=_tree_head;
-		min_node=find_min(_tree_head);
-		puts("www");
+		_tree_head=deleted_tree;//tree先頭更新
+		min_node=find_min(deleted_tree);//最小ノード抽出
+		/*リストに挿入*/
 		new_val=min_node->val;
 		new_cell=make_cell(new_val,NULL);
 		tail->next=new_cell;
 		tail=new_cell;
-
-		deleted_tree=delete_min(_tree_head,_tree_head);
-		puts("deleted");
+		/*treeから最小ノード削除*/
+		deleted_tree=delete_min(_tree_head);
 	}
-	printf("sorted head:%f",dummy.next->val.GPA);
 	return dummy.next;
 }
-
-//tree内から最小値走査＋そのノードreturn＆削除する関数を作る...A
-//tailポインタを用意する　最初はダミーを指す
-//Aの関数で最小値持ってくる→min=make_cell(new_val,NULL)
-//tail->next=min  tail=min
-//return dummy.next;
 
 CELL *input_func(char *INPUTFILE){
 	FILE *ifp;
