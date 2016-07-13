@@ -31,7 +31,6 @@ typedef struct node{
 	struct node *left,*right;
 }NODE;
 
-
 /*入力関数*/
 CELL *input_func(char *INPUTFILE);
 CELL *make_cell(REC _val,CELL *cp);
